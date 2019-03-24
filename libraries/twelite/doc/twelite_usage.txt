@@ -1,0 +1,139 @@
+TWE-Liteライブラリの説明
+                                                                                                                2016.09.25 @605e
+                                                                                                                2016.08.14 @605e
+																												2016.10.12 @605e
+
+●概要
+
+　TWE-Liteを簡単に利用するためのライブラリ（以下、本ライブラリ）である。
+
+　以下のネットワーク構成をサポートする：
+　　　親機（1台）　～　子機（n台）
+
+　親機と子機のファームウェアは、モノワイヤレスが提供する無線タグアプリ「Samp_Monitor」を
+　ベースとした改造ファームウェアを使用する。
+　TWE-Liteとセンサとの接続回路等は、下記のサイトを参照のこと：
+　　　http://mono-wireless.com/jp/products/TWE-APPS/Samp_monitor/index.html
+
+●利用上の留意点
+
+　本ライブラリを利用するには、<twelite.h>をインクルードする。
+
+　親機のファームウェアは、標準のSamp_Monitor(V1.5.5)を改造したものを利用する。
+　この改造したファームウェア（BINファイル）は、ライブラリに同梱している。
+　
+　また、子機のファームウェアも同様に、標準のSamp_Monitor(V1.5.5以降)を改造したもの
+　（本ライブラリに同梱）を利用する。
+
+●クラス
+
+　TWELiteクラスが定義されている。
+
+　ライブラリでは、TWELiteオブジェクトは定義していないため、
+　利用する場合には、使用するシリアルを指定してスケッチ側で定義する必要がある。
+　　（例）
+　　　TWELite  twelite(Serial);
+
+●定数
+
+　関数の戻り値：
+　　tweOK					正しく処理が完了した時の戻り値
+　　tweError				エラーが発生した時の戻り値
+
+　子機のタイプ：
+　　CTYPE_UNKNOWN	認識できない子機のタイプ
+　　CTYPE_TANDH		温湿度センサ(SHT-21)
+　　CTYPE_IL				照度センサ(TLS2561)
+	CTYPE_T				温度センサ(LM61BIZ、パラメータの設定で個別に校正可)
+	CTYPE_WF				水流センサ(YF-S201等、パラメータの設定で異なるセンサも利用可）
+
+●メソッド
+
+　クラスTWELiteのオブジェクトに対して、下記のメソッドを呼び出すことができる。
+
+　コンストラクタ
+	TWELite(HardwareSerial &port) 
+		使用するハードウェアシリアルポートを指定してオブジェクトを生成する。
+
+　メソッド
+	void begin(uint32_t baudrate)
+		本ライブラリを初期化する。
+
+	void end(void)
+		本ライブラリを終了する。
+
+	boolean hasReceivedMessages(void)
+		子機から一つ以上のメッセージを受信しているか否かを調べる。
+
+	int parseMessage(void)
+		受信している最初のメッセージを解析・分解する。
+		本メソッドを呼び出した後、get*関数を呼び出して値を取得することができる。
+
+	void discardMessages(void)
+		バッファにたまっているメッセージを破棄する。
+		認識できないメッセージを受信した際に、この関数を呼び出してバッファを
+		一旦クリアすることを推奨する。
+
+	uint8_t getChildID(void)
+		子機のIDを取得する。
+
+	uint8_t getChildType(void)
+		子機のタイプ（CTYPE_*）を取得する。
+
+	int getTemperature(void)
+		温度（x100 度）を取得する。子機のタイプがCTYPE_TANHの時のみ呼び出すことができる。
+		例えば、戻り値が 2368 の場合は、温度は 23.68℃ である。
+
+	int getHumidity(void)
+		相対湿度（x100 ％）を取得する。子機のタイプがCTYPE_TANHの時のみ呼び出すことができる。
+		例えば、戻り値が 6340 の場合は、湿度は 63.40% である。
+
+	long getIlluminance(void)
+		照度（lux）を取得する。子機のタイプがCTYPE_ILの時のみ呼び出すことができる。
+		最大で6万lux以上を返却する場合があるため、AVRマイコン（8bit）を利用しているArduinoを
+		使う場合はlong型として取り扱うこと。
+
+	int getBatteryVoltage(void)
+		子機の電池電圧（mV）を取得する。子機のタイプによらず呼び出すことができる。
+
+	int getRSSI(void)
+		子機の電波強度（dBm）を取得する。子機のタイプによらず呼び出すことができる。
+
+	int getTemperature2(void)
+		温度（x100 度）を取得する。子機のタイプがCTYPE_Tの時のみ呼び出すことができる。
+		例えば、戻り値が 2360 の場合は、温度は 23.60℃ である。
+
+	long getWaterFlow(void)
+		前回計測時点から流水量(x1 dL)を取得する。子機のタイプがCTYPE_WFの時のみ呼び出すことができる。
+		例えば、戻り値が 236 の場合は、流水量は 23.6L である。
+		
+	int getVoltageADC1(void)
+		子機のADC1の電圧（mV）を取得する。子機のタイプがCTYPE_ADの時のみ呼び出すことができる。
+
+	int getVoltageADC2(void)
+		子機のADC2の電圧（mV）を取得する。子機のタイプがCTYPE_WF以外の時のみ呼び出すことができる。
+
+	int getDigitalInput(void)
+		子機のDI1～4のデジタル入力状態を取得する。子機のタイプがCTYPE_TまたはCTYPE_WFの時のみ
+		呼び出すことができる。HIGHの時はビット値が0、LOWの時はビット値が1となる（つまり、反転する）。
+		DI1はbit0、DI2はbit1、DI3はbit2、DI4はbit3の位置にそれぞれ出力される。
+	
+●ライブラリの使い方
+
+　サンプルスケッチsample_tweliteを参照のこと。
+　基本的な処理の流れは下記の通り：
+
+  0) インスタンスを定義する
+　　　TWELite  twelite(Serial);
+　1) begin()を呼び出してライブラリを初期化する
+　　　twelite.begin()
+  2) メッセージが届いているかどうかを調べる
+  　　twelite.hasReceivedMessages()
+　3) 届いていれば、パージング（メッセージの解析・分解）する
+　　　twelite.parseMessage()
+　4) 正しくパージングできれば、get*()関数を使ってデータを取り出す。子機のタイプに合った関数を呼び出せる。
+　　　int tX100 = twelite.getTemperature();
+　5) パージングがエラーの時は、UARTバッファにたまっている全メッセージを破棄すること。
+　　　	twelite.discardMessages()
+
+---																												
