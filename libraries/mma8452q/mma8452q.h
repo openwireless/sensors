@@ -1,20 +1,19 @@
 /*
- *	MMA8451Q.h
+ *	MMA8452Q.h
  *
- *	MMA8451Q control library for Arduino (Interface)
+ *	MMA8452Q control library for Arduino (Interface)
  *
  *	Version:
- *		R1.0  2017.01.09
- *		R1.1  2017.02.01  add getAccelerations()
- *
+ *		R1.0  2019.06.16  fork from mma8451q(R1.1)
+ *      
  *	Note:
- *		MMA8451Q is a 14bit ADC 3-Axis MEMS Accelerometer.
+ *		MMA8452Q is a 12bit ADC 3-Axis MEMS Accelerometer.
  *
- *	Copyright(c) 2017 A.Daikoku
+ *	Copyright(c) 2019 A.Daikoku
  */
 
-#ifndef _MMA8451Q_
-#define _MMA8451Q_
+#ifndef _MMA8452Q_H_
+#define _MMA8452Q_H_
 
 #include <Arduino.h>
 #include <Wire.h>
@@ -33,12 +32,12 @@
 	/**	Register_name				Register_No	   [mode] Default_value **/
 #define	m8REG_STATUS				0x00		// [R] 0x00 if FMODE = 0 then real time status
 #define	m8REG_F_STATUS				0x00		// [R] 0x00 if FMODE > 0 then FIFO status
-#define	m8REG_OUT_X_MSB				0x01		// [R] -
-#define	m8REG_OUT_X_LSB				0x02		// [R] -
-#define	m8REG_OUT_Y_MSB				0x03		// [R] -
-#define	m8REG_OUT_Y_LSB				0x04		// [R] -
-#define	m8REG_OUT_Z_MSB				0x05		// [R] -
-#define	m8REG_OUT_Z_LSB				0x06		// [R] -
+#define	m8REG_OUT_X_MSB				0x01		// [R] MSB 8-bit of X axis acceleration
+#define	m8REG_OUT_X_LSB				0x02		// [R] LSB 4-bit(b7-b4) of X axis acceleration
+#define	m8REG_OUT_Y_MSB				0x03		// [R] MSB 8-bit of Y axis acceleration
+#define	m8REG_OUT_Y_LSB				0x04		// [R] LSB 4-bit(b7-b4) of Y axis acceleration
+#define	m8REG_OUT_Z_MSB				0x05		// [R] MSB 8-bit of Z axis acceleration
+#define	m8REG_OUT_Z_LSB				0x06		// [R] LSB 4-bit(b7-b4) of Z axis acceleration
 #define	m8REG_F_SETUP				0x09		// [RW] 0x00
 #define	m8REG_TRIG_CFG				0x0a		// [RW] 0x00
 #define	m8REG_SYSMOD				0x0b		// [R] 0x00
@@ -56,7 +55,7 @@
 #define	m8REG_FF_MT_THS				0x17		// [RW] 0x00
 #define	m8REG_FF_MT_COUNT			0x18		// [RW] 0x00
 #define	m8REG_TRANSIENT_CFG			0x1d		// [RW] 0x00
-#define	m8REG_TRANSIENT_SCR			0x1e		// [R] 0x00
+#define	m8REG_TRANSIENT_SRC			0x1e		// [R] 0x00
 #define	m8REG_TRANSIENT_THS			0x1f		// [RW] 0x00
 #define	m8REG_TRANSIENT_COUNT		0x20		// [RW] 0x00
 #define	m8REG_PULSE_CFG				0x21		// [RW] 0x00
@@ -120,7 +119,7 @@
 #define	m8INT_SOURCE_SRC_DRDY		0x01		// [R] 0x00
 
 // m8REG_WHO_AM_I
-#define	m8WHO_AM_I_MMA8451Q_ID		0x1a		// [R] 0x1a
+#define	m8WHO_AM_I_MMA8452Q_ID		0x2a		// [R] 0x2a(not equal to mma8451q)
 
 // m8REG_XYZ_DATA_CFG
 #define	m8XYZ_DATA_CFG_HPF_OUT		0x10		// [RW] 0x00
@@ -140,7 +139,7 @@
 #define	m8HP_FILTER_CUTOFF_SEL_N2HZ		0X01
 #define	m8HP_FILTER_CUTOFF_SEL_N1HZ		0X02
 #define	m8HP_FILTER_CUTOFF_SEL_N05HZ	0X03
-#define	m8HP_FILTER_CUTOFF_SEL_H16HZ	0X00		// @High resplution mode
+#define	m8HP_FILTER_CUTOFF_SEL_H16HZ	0X00		// @High resolution mode
 #define	m8HP_FILTER_CUTOFF_SEL_H8HZ		0X01
 #define	m8HP_FILTER_CUTOFF_SEL_H4HZ		0X02
 #define	m8HP_FILTER_CUTOFF_SEL_H2HZ 	0X03
@@ -205,20 +204,20 @@
 #define	m8CTRL_REG4_INT_EN_DRY		0x01		// [RW] 0x00
 
 // m8REG_CTRL_REG5
-#define	m8CTRL_REG4_INT_CFG_ASLP	0x80		// [RW] 0x00
-#define	m8CTRL_REG4_INT_CFG_FIFO	0x40		// [RW] 0x00
-#define	m8CTRL_REG4_INT_CFG_TRANS	0x20		// [RW] 0x00
-#define	m8CTRL_REG4_INT_CFG_LNDPRT	0x10		// [RW] 0x00
-#define	m8CTRL_REG4_INT_CFG_PULSE	0x08		// [RW] 0x00
-#define	m8CTRL_REG4_INT_CFG_FF_MT	0x04		// [RW] 0x00
-#define	m8CTRL_REG4_INT_CFG_DRY		0x01		// [RW] 0x00
+#define	m8CTRL_REG5_INT_CFG_ASLP	0x80		// [RW] 0x00
+#define	m8CTRL_REG5_INT_CFG_FIFO	0x40		// [RW] 0x00
+#define	m8CTRL_REG5_INT_CFG_TRANS	0x20		// [RW] 0x00
+#define	m8CTRL_REG5_INT_CFG_LNDPRT	0x10		// [RW] 0x00
+#define	m8CTRL_REG5_INT_CFG_PULSE	0x08		// [RW] 0x00
+#define	m8CTRL_REG5_INT_CFG_FF_MT	0x04		// [RW] 0x00
+#define	m8CTRL_REG5_INT_CFG_DRY		0x01		// [RW] 0x00
 
 /*
- *	MMA8451Q class
+ *	MMA8452Q class
  */
-class MMA8451Q {
+class MMA8452Q {
   public:
-	MMA8451Q(int sa0 = HIGH);						// Constructor with SA0
+	MMA8452Q(int sa0 = HIGH);						// Constructor with SA0
 	uint8_t readRegister(uint8_t reg);				// Read byte data from a register
 	void readMultiRegisters(uint8_t reg, int bytes, uint8_t data[]);	// Read multi bytes data from registers
 	void writeRegister(uint8_t reg, uint8_t data);	// Write byte data to a register
@@ -231,20 +230,20 @@ class MMA8451Q {
 	int readFIFO(int samples[], int numSamples);	// Read data from FIFO
 	int toRaw(uint8_t high, uint8_t low) __attribute__((always_inline)) {	// Convert to 14-bit accelaration
 		int8_t signedHigh = high;
-		return ((((int)signedHigh << 8) + low) >> 2);
+		return ((((int)signedHigh << 8) + low) >> 4);
 	}
 	int tomg(int raw, int range) __attribute__((always_inline)) {
 													// Convert raw to mg
 		if (range == m8XYZ_DATA_FS_2G)
-			return (raw / 4.096);	// 4096 LSB/g @+/-2g
+			return ((float)raw / 1.024);	// 1024 LSB/g @+/-2g
 		else if (range == m8XYZ_DATA_FS_4G)
-			return (raw / 2.048);	// 2048 LSB/g @+/-4g
+			return ((float)raw / 0.512);	// 512 LSB/g @+/-4g
 		else
-			return (raw / 1.024);	// 1024 LSB/g @+/-8g
+			return ((float)raw / 0.256);	// 256 LSB/g @+/-8g
 	}
 	
   private:
 	uint8_t	_i2cAddress;
 };
 
-#endif // _MMA8451Q_
+#endif // _MMA8452Q_H_

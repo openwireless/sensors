@@ -1,0 +1,18 @@
+# Keywords of ads1115 library
+
+# Data types
+ADS1115	KEYWORD1
+
+# Methods
+configure	KEYWORD2
+readSingleEnded	KEYWORD2
+readDifferential0and1	KEYWORD2
+readDifferential2and3	KEYWORD2
+startConversion	KEYWORD2
+getLastConversionResult	KEYWORD2
+getConversionDelay	KEYWORD2
+setThresholds	KEYWORD2
+getConfig	KEYWORD2
+
+# Constans and Symbols (LITERAL1)
+
