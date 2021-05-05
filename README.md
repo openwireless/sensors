@@ -1,4 +1,4 @@
-# Libraries(or drivers) to control various sensors
+# Libraries(drivers) to control various sensors
 
 | category | library name | note |
 | --- | --- | --- |
@@ -10,6 +10,6 @@
 | temperature | stts751 | digital sensor |
 | illuminance | max44009 | wide dynamic range digital sensor |
 | distance | hi50 | long range and low cost laser distance sensor |
-| co2 | elt_s300 | high accuracy |
+| co2 | elt_s300 | high accuracy and rich functions |
 | 16-bit ADC chip | ads1115 | high accuracy ADC chip for analog sensors |
 | wireless Comminication | twelite | easy sensor network |
