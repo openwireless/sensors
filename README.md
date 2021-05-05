@@ -1,27 +1,15 @@
-# sensors
-Libraries to control various sensors
+# Libraries(or drivers) to control various sensors
 
-## Acceleration sensors
-ADXL362J
-ADXL355J
-MMA8451Q
-MMA8452Q
-kx022
-
-## Temperature sensors
-stts751
-
-## Illuminance Sensors
-max44009
-
-## Laser Distance Sensors
-hi50
-
-## CO2 Sensors
-elt_s300
-
-## 16-bit ADC Chip for analog sensors
-ads1115
-
-## Wireless Comminication modules
-twelite
+| category | library name | note |
+| --- | --- | --- |
+| acceleration | ADXL362J | ultra low power, 10-bit digital accelerometer |
+| | ADXL355J | high accuracy and resolution, 20-bit digital accelerometer |
+| | MMA8451Q | 14-bit digital accelerometer |
+| | MMA8452Q | 12-bit digital accelerometer |
+| | kx022 | 16-bit digital accelerometer |
+| temperature | stts751 | digital sensor |
+| illuminance | max44009 | wide dynamic range |
+| distance | hi50 | long range and low cost laser distance sensor|
+| CO2 | elt_s300 | high accuracy |
+| 16-bit ADC Chip | ads1115 | high accuracy ADC for analog sensors|
+| Wireless Comminication | twelite | easy sensor network |
